@@ -8,6 +8,8 @@ import 'package:shop/screens/product_detail_screen.dart';
 import 'package:shop/screens/products_overview_screen.dart';
 import 'package:shop/utils/app_routes.dart';
 
+import 'screens/orders_screen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -37,10 +39,12 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.deepOrange,
           primaryColor: Colors.deepOrange,
         ),
-        home: const ProductsOverviewScreen(),
+        //home: const ProductsOverviewScreen(),
         routes: {
+          AppRoutes.HOME: (ctx) => const ProductsOverviewScreen(),
           AppRoutes.PRODUCT_DETAIL: (ctx) => const ProductDetailsScreen(),
-          AppRoutes.CART: (ctx) => const CartScreen()
+          AppRoutes.CART: (ctx) => const CartScreen(),
+          AppRoutes.ORDERS: (ctx) => const OrdersScreen(),
         },
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/components/app_drawer.dart';
 import 'package:shop/components/badge.dart';
 import 'package:shop/components/product_grid.dart';
 import 'package:shop/models/cart.dart';
@@ -24,39 +25,41 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('MyShop'),
-          actions: [
-            PopupMenuButton(
-              itemBuilder: (_) => [
-                const PopupMenuItem(
-                    child: Text('Only Favorites'),
-                    value: FilterOptions.Favorites),
-                const PopupMenuItem(
-                    child: Text('Show All'), value: FilterOptions.All),
-              ],
-              onSelected: (FilterOptions selectedValue) {
-                setState(() {
-                  if (selectedValue == FilterOptions.Favorites) {
-                    _showOnlyFavorites = true;
-                  } else {
-                    _showOnlyFavorites = false;
-                  }
-                });
-              },
-            ),
-            Consumer<Cart>(
-                child: IconButton(
-                  onPressed: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.CART),
-                  icon: const Icon(Icons.shopping_cart),
-                ),
-                builder: (ctx, cart, child) => Badge(
-                      value: cart.itemCount.toString(),
-                      child: child!,
-                    )),
-          ],
-        ),
-        body: ProductGrid(showOnlyFavorites: _showOnlyFavorites));
+      appBar: AppBar(
+        title: const Text('MyShop'),
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (_) => [
+              const PopupMenuItem(
+                  child: Text('Only Favorites'),
+                  value: FilterOptions.Favorites),
+              const PopupMenuItem(
+                  child: Text('Show All'), value: FilterOptions.All),
+            ],
+            onSelected: (FilterOptions selectedValue) {
+              setState(() {
+                if (selectedValue == FilterOptions.Favorites) {
+                  _showOnlyFavorites = true;
+                } else {
+                  _showOnlyFavorites = false;
+                }
+              });
+            },
+          ),
+          Consumer<Cart>(
+              child: IconButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.CART),
+                icon: const Icon(Icons.shopping_cart),
+              ),
+              builder: (ctx, cart, child) => Badge(
+                    value: cart.itemCount.toString(),
+                    child: child!,
+                  )),
+        ],
+      ),
+      body: ProductGrid(showOnlyFavorites: _showOnlyFavorites),
+      drawer: const AppDrawer(),
+    );
   }
 }
