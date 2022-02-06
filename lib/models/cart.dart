@@ -42,7 +42,8 @@ class Cart with ChangeNotifier {
               productId: existingCartItem.productId,
               name: existingCartItem.name,
               price: existingCartItem.price,
-              quantity: existingCartItem.quantity + 1));
+              quantity: existingCartItem.quantity + 1,
+              imageUrl: existingCartItem.imageUrl));
     } else {
       _items.putIfAbsent(
           product.id,
@@ -51,7 +52,8 @@ class Cart with ChangeNotifier {
               productId: product.id,
               name: product.name,
               price: product.price,
-              quantity: 1));
+              quantity: 1,
+              imageUrl: product.imageUrl));
     }
     notifyListeners();
   }
