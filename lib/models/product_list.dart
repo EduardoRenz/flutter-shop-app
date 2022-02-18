@@ -12,6 +12,10 @@ class ProductList with ChangeNotifier {
     return [..._items];
   }
 
+  int get itemCount {
+    return _items.length;
+  }
+
   void addProduct(Product product) {
     _items.add(product);
     notifyListeners();
