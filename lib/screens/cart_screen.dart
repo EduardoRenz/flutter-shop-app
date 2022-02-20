@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/components/cart_item.dart';
 import 'package:shop/models/cart.dart';
@@ -36,7 +37,8 @@ class CartScreen extends StatelessWidget {
                   Chip(
                     backgroundColor: Theme.of(context).primaryColor,
                     label: Text(
-                      '\$${cart.totalAmount}',
+                      NumberFormat.simpleCurrency(locale: 'pt_BR')
+                          .format(cart.totalAmount),
                       style: TextStyle(
                           color: Theme.of(context)
                               .primaryTextTheme

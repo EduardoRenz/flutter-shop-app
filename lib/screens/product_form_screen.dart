@@ -2,6 +2,8 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shop/models/product_list.dart';
 import '../models/product.dart';
 import '../utils/CurrencyInputFormatter.dart';
 
@@ -37,23 +39,16 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
   void _submitForm() {
-    print('submit form');
-
     final isValid = _formKey.currentState?.validate() ?? false;
-
     if (!isValid) {
       return;
     }
 
     _formKey.currentState!.save();
-    print(_formData.values);
-    final Product product = Product(
-      id: Random().nextDouble().toString(),
-      name: _formData['name'] as String,
-      description: _formData['description'] as String,
-      price: _formData['price'] as double,
-      imageUrl: _formData['imageUrl'] as String,
-    );
+
+    Provider.of<ProductList>(context, listen: false)
+        .addProductFromData(_formData);
+    Navigator.of(context).pop();
   }
 
   double? _toDouble(String value) {
