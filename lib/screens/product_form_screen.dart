@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/product.dart';
@@ -70,6 +72,23 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         : null;
   }
 
+  bool _isValidImageURL(String url) {
+    final VALID_IMAGE_EXTENSIONS = [
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'bmp',
+      'webp',
+    ];
+
+    bool isValidUR = Uri.tryParse(url)?.hasAbsolutePath ?? false;
+    bool isValidImage = VALID_IMAGE_EXTENSIONS
+        .any((extension) => url.toLowerCase().endsWith(extension));
+
+    return isValidUR && isValidImage;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,6 +136,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 maxLines: 3,
                 onSaved: (description) =>
                     _formData['description'] = description ?? '',
+                validator: (_description) => _description!.trim().isEmpty ||
+                        _description.trim().length < 3
+                    ? 'A valid description is required'
+                    : null,
               ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -131,6 +154,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       onFieldSubmitted: (_) => _submitForm(),
                       onSaved: (imageUrl) =>
                           _formData['imageUrl'] = imageUrl ?? '',
+                      validator: (_imageURL) =>
+                          _isValidImageURL(_imageURL ?? '')
+                              ? null
+                              : 'A valid image URL is required',
                     ),
                   ),
                   Container(
