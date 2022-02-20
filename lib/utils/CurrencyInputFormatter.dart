@@ -16,6 +16,8 @@ class CurrencyInputFormatter extends TextInputFormatter {
 
     String newText = formatter.format(value / 100);
 
+    newText = newText.replaceAll(formatter.currencySymbol, '');
+
     return newValue.copyWith(
         text: newText,
         selection: TextSelection.collapsed(offset: newText.length));

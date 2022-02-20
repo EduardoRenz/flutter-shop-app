@@ -54,7 +54,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
   }
 
-  double? _digiOnly(String value) {
+  double? _toDouble(String value) {
     if (value.isEmpty) {
       return 0;
     }
@@ -94,10 +94,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 textInputAction: TextInputAction.next,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                onSaved: (price) => _formData['price'] = _digiOnly(price!)
+                onSaved: (price) => _formData['price'] = _toDouble(price!)
                     as Object, // double.tryParse(price!) ?? 0,
                 validator: (_price) =>
-                    _price!.trim().isEmpty || _digiOnly(_price) == null
+                    _price!.trim().isEmpty || _toDouble(_price) == null
                         ? 'A valid price is required'
                         : null,
                 //onChanged: (value) => _formatPrice(value),
