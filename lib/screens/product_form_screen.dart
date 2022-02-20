@@ -38,13 +38,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     print('submit form');
 
     final isValid = _formKey.currentState?.validate() ?? false;
-    print(_formData.values);
 
     if (!isValid) {
       return;
     }
 
     _formKey.currentState!.save();
+    print(_formData.values);
     final Product product = Product(
       id: Random().nextDouble().toString(),
       name: _formData['name'] as String,
@@ -58,9 +58,16 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (value.isEmpty) {
       return 0;
     }
-
     String onlyNumbers = value.replaceAll(RegExp(r'[^\d]'), '');
     return double.tryParse(onlyNumbers)! / 100;
+  }
+
+  String? _validatePrice(String? price) {
+    return price!.trim().isEmpty ||
+            _toDouble(price) == null ||
+            _toDouble(price)! <= 0
+        ? 'A valid price is required'
+        : null;
   }
 
   @override
@@ -90,16 +97,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         : null,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Price'),
+                decoration: const InputDecoration(
+                    labelText: 'Price', prefixText: 'R\$'),
                 textInputAction: TextInputAction.next,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 onSaved: (price) => _formData['price'] = _toDouble(price!)
                     as Object, // double.tryParse(price!) ?? 0,
-                validator: (_price) =>
-                    _price!.trim().isEmpty || _toDouble(_price) == null
-                        ? 'A valid price is required'
-                        : null,
+                validator: _validatePrice,
                 //onChanged: (value) => _formatPrice(value),
                 inputFormatters: [
                   CurrencyInputFormatter(),
