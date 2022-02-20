@@ -2,17 +2,20 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class CurrencyInputFormatter extends TextInputFormatter {
+  final String locale;
+
+  CurrencyInputFormatter({this.locale = "pt_Br"});
+
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
     if (newValue.selection.baseOffset == 0) {
-      print(true);
       return newValue;
     }
     String onlyNumbers = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
     double value = double.parse(onlyNumbers);
 
-    final formatter = NumberFormat.simpleCurrency(locale: "pt_Br");
+    final formatter = NumberFormat.simpleCurrency(locale: locale);
 
     String newText = formatter.format(value / 100);
 
