@@ -19,6 +19,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _imageURLFocus = FocusNode();
   final _formKey = GlobalKey<FormState>();
   final _formData = Map<String, Object>();
+  bool _isLoading = false;
 
   void _onImageUpdate() {
     setState(() {});
@@ -53,13 +54,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   @override
   void dispose() {
+    _imageURLFocus.removeListener(_onImageUpdate);
     _imageURLFocus.dispose();
     _imageUrlController.dispose();
-    _imageURLFocus.removeListener(_onImageUpdate);
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) {
       return;
@@ -67,7 +68,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     _formKey.currentState!.save();
 
-    Provider.of<ProductList>(context, listen: false).saveProduct(_formData);
+    setState(() {
+      _isLoading = true;
+    });
+
+    await Provider.of<ProductList>(context, listen: false)
+        .saveProduct(_formData);
+
+    setState(() {
+      _isLoading = false;
+    });
+
     Navigator.of(context).pop();
   }
 
@@ -116,87 +127,89 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Form(
-            key: _formKey,
-            child: ListView(children: [
-              TextFormField(
-                initialValue: _formData['name']?.toString(),
-                decoration: const InputDecoration(labelText: 'Name'),
-                textInputAction: TextInputAction.next,
-                onSaved: (name) => _formData['name'] = name ?? '',
-                validator: (_name) =>
-                    _name!.trim().isEmpty || _name.trim().length < 3
-                        ? 'A valid name is required'
-                        : null,
-              ),
-              TextFormField(
-                initialValue: _formData['price']?.toString(),
-                decoration: const InputDecoration(
-                    labelText: 'Price', prefixText: 'R\$'),
-                textInputAction: TextInputAction.next,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                onSaved: (price) => _formData['price'] = _toDouble(price!)
-                    as Object, // double.tryParse(price!) ?? 0,
-                validator: _validatePrice,
-                //onChanged: (value) => _formatPrice(value),
-                inputFormatters: [
-                  CurrencyInputFormatter(),
-                ],
-              ),
-              TextFormField(
-                initialValue: _formData['description']?.toString(),
-                decoration: const InputDecoration(labelText: 'Description'),
-                textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.multiline,
-                maxLines: 3,
-                onSaved: (description) =>
-                    _formData['description'] = description ?? '',
-                validator: (_description) => _description!.trim().isEmpty ||
-                        _description.trim().length < 3
-                    ? 'A valid description is required'
-                    : null,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      decoration: const InputDecoration(labelText: 'Image URL'),
-                      textInputAction: TextInputAction.done,
-                      keyboardType: TextInputType.url,
-                      controller: _imageUrlController,
-                      focusNode: _imageURLFocus,
-                      onFieldSubmitted: (_) => _submitForm(),
-                      onSaved: (imageUrl) =>
-                          _formData['imageUrl'] = imageUrl ?? '',
-                      validator: (_imageURL) =>
-                          _isValidImageURL(_imageURL ?? '')
-                              ? null
-                              : 'A valid image URL is required',
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(15),
+              child: Form(
+                  key: _formKey,
+                  child: ListView(children: [
+                    TextFormField(
+                      initialValue: _formData['name']?.toString(),
+                      decoration: const InputDecoration(labelText: 'Name'),
+                      textInputAction: TextInputAction.next,
+                      onSaved: (name) => _formData['name'] = name ?? '',
+                      validator: (_name) =>
+                          _name!.trim().isEmpty || _name.trim().length < 3
+                              ? 'A valid name is required'
+                              : null,
                     ),
-                  ),
-                  Container(
-                    width: 100,
-                    height: 100,
-                    margin: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey, width: 1),
+                    TextFormField(
+                      initialValue: _formData['price']?.toString(),
+                      decoration: const InputDecoration(
+                          labelText: 'Price', prefixText: 'R\$'),
+                      textInputAction: TextInputAction.next,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      onSaved: (price) => _formData['price'] = _toDouble(price!)
+                          as Object, // double.tryParse(price!) ?? 0,
+                      validator: _validatePrice,
+                      //onChanged: (value) => _formatPrice(value),
+                      inputFormatters: [
+                        CurrencyInputFormatter(),
+                      ],
                     ),
-                    child: _imageUrlController.text.isEmpty
-                        ? const Text('Image Preview')
-                        : FittedBox(
-                            child: Image.network(_imageUrlController.text),
-                            fit: BoxFit.cover,
+                    TextFormField(
+                      initialValue: _formData['description']?.toString(),
+                      decoration:
+                          const InputDecoration(labelText: 'Description'),
+                      textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 3,
+                      onSaved: (description) =>
+                          _formData['description'] = description ?? '',
+                      validator: (_description) =>
+                          _description!.trim().isEmpty ||
+                                  _description.trim().length < 3
+                              ? 'A valid description is required'
+                              : null,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            decoration:
+                                const InputDecoration(labelText: 'Image URL'),
+                            textInputAction: TextInputAction.done,
+                            keyboardType: TextInputType.url,
+                            controller: _imageUrlController,
+                            focusNode: _imageURLFocus,
+                            onFieldSubmitted: (_) => _submitForm(),
+                            onSaved: (imageUrl) =>
+                                _formData['imageUrl'] = imageUrl ?? '',
+                            validator: (_imageURL) =>
+                                _isValidImageURL(_imageURL ?? '')
+                                    ? null
+                                    : 'A valid image URL is required',
                           ),
-                  )
-                ],
-              ),
-            ])),
-      ),
+                        ),
+                        Container(
+                          width: 100,
+                          height: 100,
+                          margin: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey, width: 1),
+                          ),
+                          child: _imageUrlController.text.isEmpty
+                              ? const Text('Image Preview')
+                              : Image.network(_imageUrlController.text),
+                        )
+                      ],
+                    ),
+                  ])),
+            ),
     );
   }
 }

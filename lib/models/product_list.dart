@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:shop/data/dummy_data.dart';
 import 'package:shop/models/product.dart';
 
 class ProductList with ChangeNotifier {
+  final _baseURL = 'https://shop-7706e-default-rtdb.firebaseio.com';
   final List<Product> _items = dummyProducts;
 
   List<Product> get favoriteItems =>
@@ -18,8 +21,28 @@ class ProductList with ChangeNotifier {
     return _items.length;
   }
 
-  void addProduct(Product product) {
-    _items.add(product);
+  Future<void> addProduct(Product product) async {
+    final http.Response response =
+        await http.post(Uri.parse('$_baseURL/products.json'),
+            body: jsonEncode({
+              'name': product.name,
+              'description': product.description,
+              'imageUrl': product.imageUrl,
+              'price': product.price,
+              'isFavorite': product.isFavorite,
+            }));
+
+    final id = json.decode(response.body)['name'];
+    final newProduct = Product(
+      id: id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      isFavorite: product.isFavorite,
+    );
+
+    _items.add(newProduct);
     notifyListeners();
   }
 
@@ -36,7 +59,7 @@ class ProductList with ChangeNotifier {
     notifyListeners();
   }
 
-  void saveProduct(Map<String, Object> data) {
+  Future<void> saveProduct(Map<String, Object> data) async {
     final bool hasId = data['id'] != null;
 
     final Product newProduct = Product(
@@ -50,7 +73,7 @@ class ProductList with ChangeNotifier {
     if (hasId) {
       updateProduct(newProduct);
     } else {
-      addProduct(newProduct);
+      await addProduct(newProduct);
     }
   }
 }
