@@ -31,6 +31,27 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_formData.isEmpty) {
+      final arg = ModalRoute.of(context)!.settings.arguments;
+
+      if (arg != null) {
+        final product = arg as Product;
+
+        _formData['id'] = product.id;
+        _formData['name'] = product.name;
+        _formData['description'] = product.description;
+        _formData['price'] = product.price;
+        _formData['imageUrl'] = product.imageUrl;
+
+        _imageUrlController.text = product.imageUrl;
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _imageURLFocus.dispose();
     _imageUrlController.dispose();
@@ -46,8 +67,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     _formKey.currentState!.save();
 
-    Provider.of<ProductList>(context, listen: false)
-        .addProductFromData(_formData);
+    Provider.of<ProductList>(context, listen: false).saveProduct(_formData);
     Navigator.of(context).pop();
   }
 
@@ -102,6 +122,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             key: _formKey,
             child: ListView(children: [
               TextFormField(
+                initialValue: _formData['name']?.toString(),
                 decoration: const InputDecoration(labelText: 'Name'),
                 textInputAction: TextInputAction.next,
                 onSaved: (name) => _formData['name'] = name ?? '',
@@ -111,6 +132,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                         : null,
               ),
               TextFormField(
+                initialValue: _formData['price']?.toString(),
                 decoration: const InputDecoration(
                     labelText: 'Price', prefixText: 'R\$'),
                 textInputAction: TextInputAction.next,
@@ -125,6 +147,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 ],
               ),
               TextFormField(
+                initialValue: _formData['description']?.toString(),
                 decoration: const InputDecoration(labelText: 'Description'),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.multiline,
