@@ -68,18 +68,27 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     _formKey.currentState!.save();
 
-    setState(() {
-      _isLoading = true;
-    });
+    try {
+      setState(() {
+        _isLoading = true;
+      });
 
-    await Provider.of<ProductList>(context, listen: false)
-        .saveProduct(_formData);
+      await Provider.of<ProductList>(context, listen: false)
+          .saveProduct(_formData);
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    Navigator.of(context).pop();
+      Navigator.of(context).pop();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   double? _toDouble(String value) {
