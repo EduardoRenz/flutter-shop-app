@@ -5,8 +5,27 @@ import 'package:shop/components/product_item.dart';
 import 'package:shop/models/product_list.dart';
 import 'package:shop/utils/app_routes.dart';
 
-class ProductsScreen extends StatelessWidget {
+class ProductsScreen extends StatefulWidget {
   const ProductsScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ProductsScreen> createState() => _ProductsScreenState();
+}
+
+class _ProductsScreenState extends State<ProductsScreen> {
+  Future<void> _refreshProducts(BuildContext context) async {
+    try {
+      await Provider.of<ProductList>(context, listen: false).loadProducts();
+      setState(() {});
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to load products'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,16 +43,19 @@ class ProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: const AppDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListView.builder(
-            itemCount: products.itemCount,
-            itemBuilder: (ctx, i) => Column(
-                  children: [
-                    ProductItem(products.items[i]),
-                    const Divider(),
-                  ],
-                )),
+      body: RefreshIndicator(
+        onRefresh: () => _refreshProducts(context),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ListView.builder(
+              itemCount: products.itemCount,
+              itemBuilder: (ctx, i) => Column(
+                    children: [
+                      ProductItem(products.items[i]),
+                      const Divider(),
+                    ],
+                  )),
+        ),
       ),
     );
   }

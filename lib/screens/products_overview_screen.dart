@@ -25,10 +25,9 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   bool _showOnlyFavorites = false;
-  bool _isLoading = true;
-
+  bool _isLoading = false;
   StreamSubscription<Uri?>? _deepLinkSubscription;
-  @override
+
   @override
   void initState() {
     if (mounted) {
