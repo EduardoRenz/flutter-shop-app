@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/components/app_drawer.dart';
@@ -6,6 +8,8 @@ import 'package:shop/components/product_grid.dart';
 import 'package:shop/models/cart.dart';
 import 'package:shop/models/product_list.dart';
 import 'package:shop/utils/app_routes.dart';
+
+import '../services/deep_link_service.dart';
 
 enum FilterOptions {
   Favorites,
@@ -21,6 +25,27 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   bool _showOnlyFavorites = false;
+  bool _isLoading = true;
+
+  StreamSubscription<Uri?>? _deepLinkSubscription;
+  @override
+  @override
+  void initState() {
+    if (mounted) {
+      if (_deepLinkSubscription == null) {
+        setState(() {
+          _deepLinkSubscription = handleIncomingLinks(context);
+        });
+      }
+      handleInitialUri();
+    }
+
+    super.initState();
+
+    Provider.of<ProductList>(context, listen: false)
+        .loadProducts()
+        .then((value) => setState(() => _isLoading = false));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +83,9 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                   )),
         ],
       ),
-      body: ProductGrid(showOnlyFavorites: _showOnlyFavorites),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ProductGrid(showOnlyFavorites: _showOnlyFavorites),
       drawer: const AppDrawer(),
     );
   }
