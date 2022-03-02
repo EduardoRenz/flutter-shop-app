@@ -3,12 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:shop/data/dummy_data.dart';
 import 'package:shop/models/product.dart';
 
 class ProductList with ChangeNotifier {
-  final Uri _url =
-      Uri.parse('https://shop-7706e-default-rtdb.firebaseio.com/products.json');
+  final String _baseUrl =
+      'https://shop-7706e-default-rtdb.firebaseio.com/products';
   final List<Product> _items = [];
 
   List<Product> get favoriteItems =>
@@ -23,7 +22,7 @@ class ProductList with ChangeNotifier {
   }
 
   Future<void> loadProducts() async {
-    final http.Response response = await http.get(_url);
+    final http.Response response = await http.get(Uri.parse('$_baseUrl.json'));
     if (response.body == 'null') return;
     Map<String, dynamic> data = jsonDecode(response.body);
     _items.clear();
@@ -39,7 +38,7 @@ class ProductList with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    final http.Response response = await http.post(_url,
+    final http.Response response = await http.post(Uri.parse('$_baseUrl.json'),
         body: jsonEncode({
           'name': product.name,
           'description': product.description,
@@ -62,15 +61,36 @@ class ProductList with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateProduct(Product product) {
+  Future<void> updateProduct(Product product) async {
     final index = _items.indexWhere((prod) => prod.id == product.id);
     if (index >= 0) {
+      await http.patch(
+        Uri.parse('$_baseUrl/${product.id}.json'),
+        body: jsonEncode({
+          'name': product.name,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+        }),
+      );
+
       _items[index] = product;
       notifyListeners();
     }
   }
 
-  void removeProduct(String id) {
+  Future<void> removeProduct(String id) async {
+    final index = _items.indexWhere((prod) => prod.id == id);
+    if (index >= 0) {
+      final url = Uri.parse('$_baseUrl/$id.json');
+      final response = await http.delete(url);
+      if (response.statusCode >= 400) {
+        throw Exception('Failed to delete product');
+      }
+      _items.removeAt(index);
+      notifyListeners();
+    }
+
     _items.removeWhere((prod) => prod.id == id);
     notifyListeners();
   }
@@ -87,7 +107,7 @@ class ProductList with ChangeNotifier {
     );
 
     if (hasId) {
-      updateProduct(newProduct);
+      await updateProduct(newProduct);
     } else {
       await addProduct(newProduct);
     }

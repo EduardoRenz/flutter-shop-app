@@ -22,9 +22,19 @@ class ProductItem extends StatelessWidget {
         ),
         TextButton(
           child: const Text("Yes"),
-          onPressed: () {
-            Provider.of<ProductList>(context, listen: false)
-                .removeProduct(product.id);
+          onPressed: () async {
+            try {
+              await Provider.of<ProductList>(context, listen: false)
+                  .removeProduct(product.id);
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("An error occurred: $e"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+
             Navigator.of(context).pop();
           },
         ),
