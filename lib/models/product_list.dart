@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shop/models/product.dart';
+import 'package:shop/utils/constants.dart';
 
 class ProductList with ChangeNotifier {
-  final String _baseUrl =
-      'https://shop-7706e-default-rtdb.firebaseio.com/products';
+  final String _baseUrl = Constants.PRODUCTS_BASE_URL;
   final List<Product> _items = [];
 
   List<Product> get favoriteItems =>

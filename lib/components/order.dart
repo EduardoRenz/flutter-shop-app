@@ -19,7 +19,7 @@ class _OrderWidgetState extends State<OrderWidget> {
       child: Column(
         children: [
           ListTile(
-            leading: Icon(Icons.shopping_cart),
+            leading: const Icon(Icons.shopping_cart),
             title: Text('R\$ ${widget.order.total.toStringAsFixed(2)}'),
             subtitle: Text(
               DateFormat('dd/MM/yyyy hh:mm').format(widget.order.date),
@@ -35,7 +35,7 @@ class _OrderWidgetState extends State<OrderWidget> {
           ),
           if (_expanded)
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
               height: widget.order.products.length * 25.0 + 10,
               child: ListView(
                 children: widget.order.products

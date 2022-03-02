@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop/utils/constants.dart';
 
 class Product with ChangeNotifier {
   final String id;
@@ -21,8 +22,7 @@ class Product with ChangeNotifier {
   });
 
   Future<void> toggleFavorite() async {
-    const String _baseUrl =
-        'https://shop-7706e-default-rtdb.firebaseio.com/products';
+    const String _baseUrl = Constants.PRODUCTS_BASE_URL;
     await http.patch(
       Uri.parse('$_baseUrl/$id.json'),
       body: jsonEncode({
