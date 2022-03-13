@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shop/exceptions/auth_exception.dart';
+import 'package:shop/models/auth.dart';
 
 enum AuthMode { login, signup }
 
@@ -23,7 +26,7 @@ class _AuthFormState extends State<AuthForm> {
   bool _isLogin() => _authMode == AuthMode.login;
   bool _isSignup() => _authMode == AuthMode.signup;
 
-  void _submit() {
+  Future<void> _submit() async {
     bool isValid = _formKey.currentState?.validate() ?? false;
 
     if (!isValid) return;
@@ -33,15 +36,32 @@ class _AuthFormState extends State<AuthForm> {
     });
 
     _formKey.currentState?.save();
+    Auth auth = Provider.of(context, listen: false);
 
-    if (_isLogin()) {
-      // _login();
-    } else {
-      //_signup();
+    try {
+      if (_isLogin()) {
+        await auth.login(_authData['email']!, _authData['password']!);
+      } else {
+        await auth.signUp(_authData['email']!, _authData['password']!);
+      }
+    } on AuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Unknown error'),
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
     }
 
     setState(() {
-      _isLoading = true;
+      _isLoading = false;
     });
   }
 
@@ -49,7 +69,7 @@ class _AuthFormState extends State<AuthForm> {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return SizedBox(
-      height: 400,
+      height: 320,
       width: deviceSize.width * 0.75,
       child: Card(
         elevation: 8,
