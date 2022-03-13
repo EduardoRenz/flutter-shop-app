@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/models/auth.dart';
 import 'package:shop/models/cart.dart';
@@ -14,8 +15,9 @@ import 'package:shop/utils/app_routes.dart';
 import 'screens/orders_screen.dart';
 import 'screens/products_screen.dart';
 
-void main() {
+Future<void> main() async {
   runApp(const MyApp());
+  await dotenv.load();
 }
 
 class MyApp extends StatelessWidget {
