@@ -7,8 +7,11 @@ import 'package:shop/models/product.dart';
 import 'package:shop/utils/constants.dart';
 
 class ProductList with ChangeNotifier {
+  final String _token;
+  final List<Product> _items;
+  ProductList(this._token, this._items);
+
   final String _baseUrl = Constants.PRODUCTS_BASE_URL;
-  final List<Product> _items = [];
 
   List<Product> get favoriteItems =>
       _items.where((prodItem) => prodItem.isFavorite).toList();
@@ -22,7 +25,8 @@ class ProductList with ChangeNotifier {
   }
 
   Future<void> loadProducts() async {
-    final http.Response response = await http.get(Uri.parse('$_baseUrl.json'));
+    final http.Response response =
+        await http.get(Uri.parse('$_baseUrl.json?auth=$_token'));
     if (response.body == 'null') return;
     Map<String, dynamic> data = jsonDecode(response.body);
     _items.clear();
@@ -38,14 +42,15 @@ class ProductList with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    final http.Response response = await http.post(Uri.parse('$_baseUrl.json'),
-        body: jsonEncode({
-          'name': product.name,
-          'description': product.description,
-          'imageUrl': product.imageUrl,
-          'price': product.price,
-          'isFavorite': product.isFavorite,
-        }));
+    final http.Response response =
+        await http.post(Uri.parse('$_baseUrl.json?auth=$_token'),
+            body: jsonEncode({
+              'name': product.name,
+              'description': product.description,
+              'imageUrl': product.imageUrl,
+              'price': product.price,
+              'isFavorite': product.isFavorite,
+            }));
 
     final id = json.decode(response.body)['name'];
     final newProduct = Product(
@@ -65,7 +70,7 @@ class ProductList with ChangeNotifier {
     final index = _items.indexWhere((prod) => prod.id == product.id);
     if (index >= 0) {
       await http.patch(
-        Uri.parse('$_baseUrl/${product.id}.json'),
+        Uri.parse('$_baseUrl/${product.id}.json?auth=$_token'),
         body: jsonEncode({
           'name': product.name,
           'description': product.description,
@@ -82,7 +87,7 @@ class ProductList with ChangeNotifier {
   Future<void> removeProduct(String id) async {
     final index = _items.indexWhere((prod) => prod.id == id);
     if (index >= 0) {
-      final url = Uri.parse('$_baseUrl/$id.json');
+      final url = Uri.parse('$_baseUrl/$id.json?auth=$_token');
       final response = await http.delete(url);
       if (response.statusCode >= 400) {
         throw Exception('Failed to delete product');

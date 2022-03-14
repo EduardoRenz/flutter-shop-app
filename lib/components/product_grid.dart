@@ -6,7 +6,8 @@ import 'package:shop/models/product_list.dart';
 
 class ProductGrid extends StatelessWidget {
   final bool showOnlyFavorites;
-  const ProductGrid({this.showOnlyFavorites = false});
+  const ProductGrid({Key? key, this.showOnlyFavorites = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class ProductGrid extends StatelessWidget {
           mainAxisSpacing: 10),
       itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
         value: loadedProducts[i],
-        child: ProductGridItem(),
+        child: const ProductGridItem(),
       ),
     );
   }
