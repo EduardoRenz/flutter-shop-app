@@ -41,6 +41,7 @@ class _AuthFormState extends State<AuthForm> {
     try {
       if (_isLogin()) {
         await auth.login(_authData['email']!, _authData['password']!);
+        Navigator.of(context).pushReplacementNamed('/');
       } else {
         await auth.signUp(_authData['email']!, _authData['password']!);
       }

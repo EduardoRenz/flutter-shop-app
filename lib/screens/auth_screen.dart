@@ -48,7 +48,7 @@ class AuthScreen extends StatelessWidget {
                             .color),
                   ),
                 ),
-                AuthForm()
+                const AuthForm()
               ]),
         )
       ]),
