@@ -8,8 +8,13 @@ import 'package:shop/utils/constants.dart';
 
 class ProductList with ChangeNotifier {
   final String _token;
+  final String _userId;
   final List<Product> _items;
-  ProductList(this._token, this._items);
+  ProductList([
+    this._token = '',
+    this._userId = '',
+    this._items = const [],
+  ]);
 
   final String _baseUrl = Constants.PRODUCTS_BASE_URL;
 
@@ -28,16 +33,28 @@ class ProductList with ChangeNotifier {
     final http.Response response =
         await http.get(Uri.parse('$_baseUrl.json?auth=$_token'));
     if (response.body == 'null') return;
+
+    final favResponse = await http.get(
+      Uri.parse('$_baseUrl/$_userId.json?auth=$_token'),
+    );
+
+    final Map<String, dynamic> favData =
+        favResponse.body == 'null' ? {} : json.decode(favResponse.body);
+
     Map<String, dynamic> data = jsonDecode(response.body);
     _items.clear();
-    data.forEach((key, value) {
-      _items.add(Product(
-          id: key,
+    data.forEach((productId, value) {
+      final isFavorite = favData[productId] ?? false;
+      _items.add(
+        Product(
+          id: productId,
           name: value['name'],
           description: value['description'],
           price: value['price'],
           imageUrl: value['imageUrl'],
-          isFavorite: value['isFavorite']));
+          isFavorite: isFavorite,
+        ),
+      );
     });
   }
 
@@ -59,7 +76,6 @@ class ProductList with ChangeNotifier {
       description: product.description,
       price: product.price,
       imageUrl: product.imageUrl,
-      isFavorite: product.isFavorite,
     );
 
     _items.add(newProduct);
