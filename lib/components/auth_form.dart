@@ -12,10 +12,14 @@ class AuthForm extends StatefulWidget {
   State<AuthForm> createState() => _AuthFormState();
 }
 
-class _AuthFormState extends State<AuthForm> {
+class _AuthFormState extends State<AuthForm>
+    with SingleTickerProviderStateMixin {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+
+  AnimationController? _animationController;
+  Animation<Size>? _heightAnimation;
 
   AuthMode _authMode = AuthMode.login;
   final Map<String, String> _authData = {
@@ -66,11 +70,48 @@ class _AuthFormState extends State<AuthForm> {
     });
   }
 
+  void _switchAuthMode() {
+    setState(() {
+      if (_authMode == AuthMode.login) {
+        _authMode = AuthMode.signup;
+        _animationController?.forward();
+      } else {
+        _authMode = AuthMode.login;
+        _animationController?.reverse();
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _heightAnimation = Tween(
+      begin: const Size(double.infinity, 300),
+      end: const Size(double.infinity, 400),
+    ).animate(CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeIn,
+    ));
+    _heightAnimation?.addListener(() {
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return SizedBox(
-      height: 320,
+      height: _heightAnimation!.value.height,
       width: deviceSize.width * 0.75,
       child: Card(
         elevation: 8,
@@ -140,11 +181,7 @@ class _AuthFormState extends State<AuthForm> {
               const Spacer(),
               TextButton(
                   onPressed: () {
-                    setState(() {
-                      _authMode = _authMode == AuthMode.login
-                          ? AuthMode.signup
-                          : AuthMode.login;
-                    });
+                    _switchAuthMode();
                   },
                   child: Text(_isLogin() ? 'Signup' : 'Login')),
             ]),

@@ -22,7 +22,7 @@ class Store {
     try {
       String value = await getString(key);
       return jsonDecode(value);
-    } on Exception catch (e) {
+    } on Exception {
       return {};
     }
   }
