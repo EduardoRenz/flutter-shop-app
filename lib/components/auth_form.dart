@@ -19,7 +19,8 @@ class _AuthFormState extends State<AuthForm>
   bool _isLoading = false;
 
   AnimationController? _animationController;
-  Animation<Size>? _heightAnimation;
+  Animation<double>? _opacityAnimation;
+  Animation<Offset>? _slideAnimation;
 
   AuthMode _authMode = AuthMode.login;
   final Map<String, String> _authData = {
@@ -28,7 +29,7 @@ class _AuthFormState extends State<AuthForm>
   };
 
   bool _isLogin() => _authMode == AuthMode.login;
-  bool _isSignup() => _authMode == AuthMode.signup;
+  //bool _isSignup() => _authMode == AuthMode.signup;
 
   Future<void> _submit() async {
     bool isValid = _formKey.currentState?.validate() ?? false;
@@ -88,9 +89,17 @@ class _AuthFormState extends State<AuthForm>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _heightAnimation = Tween(
-      begin: const Size(double.infinity, 300),
-      end: const Size(double.infinity, 400),
+    _opacityAnimation = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeIn,
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1.5),
+      end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animationController!,
       curve: Curves.easeIn,
@@ -110,7 +119,7 @@ class _AuthFormState extends State<AuthForm>
     final deviceSize = MediaQuery.of(context).size;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      height: _isLogin() ? 300 : 400,
+      height: _isLogin() ? 300 : 370,
       width: deviceSize.width * 0.75,
       child: Card(
         elevation: 8,
@@ -151,21 +160,31 @@ class _AuthFormState extends State<AuthForm>
                     ? 'Password must be at least 6 characters'
                     : null,
               ),
-              if (_isSignup())
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Confirm Password',
-                  ),
-                  obscureText: true,
-                  validator: _isLogin()
-                      ? null
-                      : (_password) {
-                          if (_password != _passwordController.text) {
-                            return 'Passwords do not match';
-                          }
-                          return null;
-                        },
+              AnimatedContainer(
+                constraints: BoxConstraints(
+                  minHeight: _isLogin() ? 0 : 60,
+                  maxHeight: _isLogin() ? 0 : 120,
                 ),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.linear,
+                child: FadeTransition(
+                  opacity: _opacityAnimation!,
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Confirm Password',
+                    ),
+                    obscureText: true,
+                    validator: _isLogin()
+                        ? null
+                        : (_password) {
+                            if (_password != _passwordController.text) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
               if (_isLoading)
                 const CircularProgressIndicator()
