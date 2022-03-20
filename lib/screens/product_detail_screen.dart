@@ -20,21 +20,26 @@ class ProductDetailsScreen extends StatelessWidget {
               title: Text(
                 product.name,
                 textAlign: TextAlign.center,
-                style: const TextStyle(shadows: [
-                  Shadow(
-                    blurRadius: 5,
-                    color: Colors.black,
-                    offset: Offset(0, 1),
+              ),
+              background: Stack(fit: StackFit.expand, children: [
+                Hero(
+                  tag: product.id,
+                  child: Image.network(
+                    product.imageUrl,
+                    fit: BoxFit.cover,
                   ),
-                ]),
-              ),
-              background: Hero(
-                tag: product.id,
-                child: Image.network(
-                  product.imageUrl,
-                  fit: BoxFit.cover,
                 ),
-              ),
+                const DecoratedBox(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                  begin: Alignment(0, 0.8),
+                  end: Alignment(0, 0),
+                  colors: [
+                    Color.fromRGBO(0, 0, 0, 0.6),
+                    Color.fromRGBO(0, 0, 0, 0.0),
+                  ],
+                )))
+              ]),
             ),
           ),
           SliverList(
@@ -58,7 +63,6 @@ class ProductDetailsScreen extends StatelessWidget {
                   softWrap: true,
                 ),
               ),
-              SizedBox(height: 800),
             ],
           )),
         ],
