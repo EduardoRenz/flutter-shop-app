@@ -93,7 +93,7 @@ class _AuthFormState extends State<AuthForm>
       end: const Size(double.infinity, 400),
     ).animate(CurvedAnimation(
       parent: _animationController!,
-      curve: Curves.linear,
+      curve: Curves.easeIn,
     ));
 
     super.initState();
@@ -108,12 +108,10 @@ class _AuthFormState extends State<AuthForm>
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    return AnimatedBuilder(
-      animation: _heightAnimation!,
-      builder: (ctx, childForm) => SizedBox(
-          height: _heightAnimation!.value.height,
-          width: deviceSize.width * 0.75,
-          child: childForm),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: _isLogin() ? 300 : 400,
+      width: deviceSize.width * 0.75,
       child: Card(
         elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
