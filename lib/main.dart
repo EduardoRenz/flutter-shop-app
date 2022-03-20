@@ -9,6 +9,7 @@ import 'package:shop/screens/cart_screen.dart';
 import 'package:shop/screens/product_detail_screen.dart';
 import 'package:shop/screens/product_form_screen.dart';
 import 'package:shop/utils/app_routes.dart';
+import 'package:shop/utils/custom_route.dart';
 
 import 'screens/auth_or_home_screen.dart';
 import 'screens/orders_screen.dart';
@@ -47,10 +48,12 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          fontFamily: 'Lato',
-          primarySwatch: Colors.deepOrange,
-          primaryColor: Colors.deepOrange,
-        ),
+            fontFamily: 'Lato',
+            primarySwatch: Colors.deepOrange,
+            primaryColor: Colors.deepOrange,
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.android: CustomPageTransitionBuilder(),
+            })),
         //home: const ProductsOverviewScreen(),
         routes: {
           AppRoutes.AUTH_OR_HOME: (ctx) => const AuthOrHomeScreen(),
