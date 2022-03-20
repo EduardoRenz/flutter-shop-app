@@ -20,7 +20,6 @@ class _AuthFormState extends State<AuthForm>
 
   AnimationController? _animationController;
   Animation<double>? _opacityAnimation;
-  Animation<Offset>? _slideAnimation;
 
   AuthMode _authMode = AuthMode.login;
   final Map<String, String> _authData = {
@@ -92,14 +91,6 @@ class _AuthFormState extends State<AuthForm>
     _opacityAnimation = Tween(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController!,
-      curve: Curves.easeIn,
-    ));
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1.5),
-      end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animationController!,
       curve: Curves.easeIn,
